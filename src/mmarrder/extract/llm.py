@@ -4,6 +4,8 @@
 
 def leq_notes_structurer(
         df,
+        id_column,
+        note_column,
         server,
         database_path,
         database_table,
@@ -151,7 +153,9 @@ def leq_notes_structurer(
                 except Exception as e:
                     print(f"API Error at ID {current_id}: {e}")
                     # Optional: Don't save to DB on API error so it retries next time
+
+
     # Assuming your DataFrame has columns 'id_orden' and 'estado_llamada'
-    process_batch_sqlite(df, 'id_orden', 'estado_llamada')
+    process_batch_sqlite(df, id_column=id_column, note_column=note_column)
 
     print("Processing complete. Loading data from DB...")
