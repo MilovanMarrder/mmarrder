@@ -1,1 +1,1 @@
-from bar import distribution_table_as_legend
+from .bar import distribution_table_as_legend
