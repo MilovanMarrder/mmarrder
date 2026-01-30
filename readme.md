@@ -16,3 +16,5 @@ pip install git+[https://github.com/MilovanMarrder/mmarrder.git]
 - bug graphics importations fixed
 ##### 0.1.3
 - bug graphics duplication_table_as_legend rotation
+##### 0.1.4
+- feat function to structure notes from leq
