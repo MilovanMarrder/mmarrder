@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mmarrder"
+version = "0.1.0"
+description = "My custom library for Data Analysis, ETL, and Reporting"
+authors = [{name = "Milovan Marrder", email = "milovanmarrder@outlook.com"}]
+dependencies = [
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "seaborn",
+    "jinja2"  # Useful for templating Latex reports
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

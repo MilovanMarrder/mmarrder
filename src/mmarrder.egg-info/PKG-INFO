@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: mmarrder
+Version: 0.1.0
+Summary: My custom library for Data Analysis, ETL, and Reporting
+Author-email: Milovan Marrder <milovanmarrder@outlook.com>
+Requires-Dist: pandas
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: seaborn
+Requires-Dist: jinja2
