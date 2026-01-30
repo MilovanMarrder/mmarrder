@@ -103,7 +103,7 @@ def distribution_table_as_legend(
     g.figure.suptitle(titulo, y=1.02, fontsize=15, fontweight='bold')
     
     # Rotar etiquetas del eje x
-    g.set_xticklabels(rotation=25, ha='right', fontsize=11)
+    g.set_xticklabels(rotation=0, ha='right', fontsize=11)
     
     # Agregar etiquetas en las barras
     for ax in g.axes.flat:
