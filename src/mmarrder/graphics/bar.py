@@ -2,12 +2,9 @@
 #    Gráficos personalizados        
 #------------------------------------
 
-
-
-
 # Luego pensar´en las categorías para ordenarlos mejor.
 
-def distribucion_con_tabla_leyenda(
+def distribution_table_as_legend(
     df,
     columna_categoria,
     columna_grupo,

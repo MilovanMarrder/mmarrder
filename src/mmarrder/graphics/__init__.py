@@ -1,0 +1,1 @@
+from bar import distribution_table_as_legend
