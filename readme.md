@@ -8,3 +8,9 @@ Puedes instalar esta librería directamente desde GitHub usando `pip`:
 
 ```bash
 pip install git+[https://github.com/MilovanMarrder/mmarrder.git]
+```
+
+## versions
+
+##### 0.1.2
+- bug graphics importations fixed
