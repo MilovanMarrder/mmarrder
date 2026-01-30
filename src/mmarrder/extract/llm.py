@@ -28,7 +28,7 @@ def leq_notes_structurer(
         c = conn.cursor()
         # We use id_orden as the PRIMARY KEY to prevent duplicates
         c.execute(f'''
-            CREATE TABLE IF NOT EXISTS {database_table} (
+            CREATE TABLE IF NOT EXISTS "{database_table}" (
                 id_orden TEXT PRIMARY KEY,
                 primary_status TEXT,
                 is_ready BOOLEAN,
@@ -51,7 +51,7 @@ def leq_notes_structurer(
         c = conn.cursor()
         try:
             c.execute(f'''
-                INSERT OR REPLACE INTO {database_table} VALUES 
+                INSERT OR REPLACE INTO "{database_table}" VALUES 
                 (:id_orden, :primary_status, :is_ready, :confidence, :reasoning, 
                 :ts_status, :anestesia_status, :psico_status, :sano_status, 
                 :hospital_delay, :raw_response)
@@ -67,7 +67,7 @@ def leq_notes_structurer(
         conn = sqlite3.connect(database_path)
         c = conn.cursor()
         try:
-            c.execute(f"SELECT id_orden FROM {database_table}")
+            c.execute(f"""SELECT id_orden FROM "{database_table}" """)
             # Return a set for fast lookup
             return set(str(row[0]) for row in c.fetchall())
         except:
