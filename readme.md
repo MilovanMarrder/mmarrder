@@ -32,3 +32,53 @@ Install the latest version directly from the repository:
 
 ```bash
 pip install git+https://github.com/MilovanMarrder/mmarrder.git
+
+import mmarrder as mm
+import pandas as pd
+
+# 1. Connect to Clinical DB
+conn = mm.db_connector(creds='secure_config')
+
+# 2. Extract and Structure Notes
+# Converts raw text blocks into structured columns
+raw_data = pd.read_sql("SELECT notes FROM emr_table", conn)
+structured_df = mm.leq_notes_structurer(raw_data)
+
+# 3. Generate Report Graphics
+# Automatically handles legend formatting for dense medical data
+mm.plot_clinical_trends(
+    structured_df, 
+    metric='patient_volume',
+    fix_legend=True
+)
+
+```
+
+## Development Roadmap
+
+Current focus is on expanding statistical capabilities for patient outcome tracking:
+
+Basic ETL & DB Connectors (v0.1.6)
+
+Clinical Note Structuring
+
+Readmission Risk Calculation Module (In Progress)
+
+LoS (Length of Stay) Prediction Helpers
+
+
+Version History
+
+Version	Type	Changes
+0.1.6	Feat	Added simple connector to DB for rapid SQL querying.
+0.1.5	Fix	Refactored leq_notes_structurer for better error handling.
+0.1.4	Feat	Initial release of note structuring logic.
+0.1.3	Fix	Resolved graphic rotation and legend duplication bugs.
+
+
+**Milovan Marrder**
+
+_Healthcare Data Analyst | Mathematics & Business Background
+LinkedIn Profile_
+
+
