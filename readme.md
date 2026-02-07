@@ -1,4 +1,4 @@
-# mmarrder: Healthcare Analytics & ETL Toolkit 🏥📊
+# mmarrder: Healthcare Analytics & Personal ETL Toolkit
 
 > A robust Python utility library designed to streamline **Clinical Data Engineering**, **Automated Reporting**, and **Healthcare ETL pipelines**.
 
