@@ -1,5 +1,6 @@
 from .base import Infografico
-from ..utils.transformaciones import normalizar_periodos_consulta_externa, filtrar_periodo
+from mmarrder.transform import normalizar_periodos, recortar_por_ultima_linea, filtrar_periodo
+
 
 
 
