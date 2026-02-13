@@ -1,9 +1,6 @@
 from .excel_reader import detectar_tabla_excel
-from mmarrder.transform import (
-    normalizar_periodos,
-    recortar_por_ultima_linea,
-    normalizar_periodos_consulta_externa,
-)
+from mmarrder.transform import normalizar_periodos, recortar_por_ultima_linea, filtrar_periodo
+from .transform import normalizar_periodos_consulta_externa
 
 
 import pandas as pd
