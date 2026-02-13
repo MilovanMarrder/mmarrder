@@ -3,6 +3,7 @@ from mmarrder.transform import normalizar_periodos, recortar_por_ultima_linea, f
 from .transform import normalizar_periodos_consulta_externa
 
 
+
 import pandas as pd
 
 
