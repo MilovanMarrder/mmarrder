@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mmarrder"
-version = "1.0.3"
+version = "1.1.0"
 description = "My custom library for Data Analysis, ETL, and Reporting"
 authors = [{name = "Milovan Marrder", email = "milovanmarrder@outlook.com"}]
 dependencies = [

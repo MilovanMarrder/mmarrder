@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+import pandas as pd
 
 from mmarrder.io.excel_tables import ExcelTableExportOptions, export_to_excel_with_tables
 
-# Imports relativos dentro del paquete infografico
 from .hospitalizacion import Hospitalizacion
 from .servicios_apoyo import ServiciosApoyo
 from .consulta_externa import ConsultaExterna
@@ -12,7 +12,7 @@ from .pacientes_nuevos import PacientesNuevos
 from .procedimientos import Procedimientos
 
 
-def _get_dataframes_dict(ruta_infografico: str | Path):
+def _get_dataframes_dict(ruta_infografico: str | Path) -> dict[str, pd.DataFrame]:
     ruta = str(ruta_infografico)
 
     df_hosp = Hospitalizacion(ruta).produccion_periodo()
@@ -28,6 +28,27 @@ def _get_dataframes_dict(ruta_infografico: str | Path):
         "Procedimientos": df_qx,
         "Hospitalizacion": df_hosp,
     }
+
+
+def get_dataframes(ruta_infografico: str | Path) -> dict[str, pd.DataFrame]:
+    """
+    Devuelve todos los dataframes del infográfico sin exportar a Excel.
+    """
+    return _get_dataframes_dict(ruta_infografico)
+
+
+def get_consulta_externa(
+    ruta_infografico: str | Path,
+    *,
+    año: int | None = None,
+    mes: int | None = None,
+    hoja: str = "Consultas Externas",
+) -> pd.DataFrame:
+    """
+    Devuelve únicamente el dataframe de Consulta Externa (opcionalmente filtrado por año/mes).
+    """
+    ruta = str(ruta_infografico)
+    return ConsultaExterna(ruta).produccion_periodo(año=año, mes=mes, hoja=hoja)
 
 
 def from_path_to_excel_with_tables(
