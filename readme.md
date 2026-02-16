@@ -1,10 +1,27 @@
-# mmarrder: Healthcare Analytics & Personal ETL Toolkit
+# mmarrder — Healthcare Analytics & Personal ETL Toolkit
 
-> A robust Python utility library designed to streamline **Clinical Data Engineering**, **Automated Reporting**, and **Healthcare ETL pipelines**.
+A Python utility library to streamline **Healthcare ETL**, **Excel-based data structuring**, and **operational analytics** (hospital workflows, QX scheduling, reporting-ready exports).
 
-[![PyPI version](https://img.shields.io/badge/pypi-v0.1.6-blue)](https://pypi.org/project/mmarrder/)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## What this library solves
+
+In healthcare operations, a lot of value is trapped in Excel exports and semi-structured operational files.  
+`mmarrder` packages reusable pipelines and utilities to:
+
+- Transform messy Excel structures into tidy pandas DataFrames
+- Produce **Excel outputs with structured tables** (ready for Power BI / SharePoint refresh)
+- Provide **operational summaries and KPIs** with consistent logic
+
+---
+
+## Installation
+
+From GitHub:
+
+```bash
+pip install git+https://github.com/MilovanMarrder/mmarrder.git
+
 
 ## Overview
 
@@ -58,7 +75,7 @@ mm.plot_clinical_trends(
 
 Current focus is on expanding statistical capabilities for patient outcome tracking:
 
-Basic ETL & DB Connectors (v0.1.6)
+Basic ETL & DB Connectors (v1.1.1)
 
 Clinical Note Structuring
 

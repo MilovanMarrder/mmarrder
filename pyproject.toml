@@ -1,20 +1,38 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mmarrder"
-version = "1.1.0"
-description = "My custom library for Data Analysis, ETL, and Reporting"
-authors = [{name = "Milovan Marrder", email = "milovanmarrder@outlook.com"}]
+version = "1.1.1"
+description = "Personal toolkit for Healthcare Analytics, ETL pipelines, and automated reporting."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{ name = "Milovan Marrder", email = "milovanmarrder@outlook.com" }]
+
+keywords = ["healthcare", "etl", "analytics", "reporting", "excel", "openpyxl", "pandas", "hospital"]
+
 dependencies = [
-    "pandas",
-    "numpy",
-    "matplotlib",
-    "seaborn",
-    "jinja2",
-    "openpyxl"
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+    "jinja2>=3.1",
+    "openpyxl>=3.1"
 ]
+
+[project.optional-dependencies]
+viz = ["seaborn>=0.13"]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.5",
+    "mypy>=1.8"
+]
+
+[project.urls]
+Homepage = "https://github.com/MilovanMarrder/mmarrder"
+Repository = "https://github.com/MilovanMarrder/mmarrder"
+Issues = "https://github.com/MilovanMarrder/mmarrder/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
