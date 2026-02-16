@@ -10,9 +10,6 @@ from .pipeline import (
     export_excel,
 )
 
-from ..analysis.resumen import (
-    resumen_anual_tabla,
-)
 
 __all__ = [
     # API directa (tu lógica existente)
