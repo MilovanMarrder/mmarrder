@@ -87,11 +87,11 @@ LoS (Length of Stay) Prediction Helpers
 Version History
 
 Version	Type	Changes
-0.1.6	Feat	Added simple connector to DB for rapid SQL querying.
-0.1.5	Fix	Refactored leq_notes_structurer for better error handling.
-0.1.4	Feat	Initial release of note structuring logic.
+0.0.6	Feat	Added simple connector to DB for rapid SQL querying.
+0.0.5	Fix	Refactored leq_notes_structurer for better error handling.
+0.0.4	Feat	Initial release of note structuring logic.
 0.1.3	Fix	Resolved graphic rotation and legend duplication bugs.
-
+0.1.4	Fix	Resolved graphic rotation and legend duplication bugs.
 
 **Milovan Marrder**
 
