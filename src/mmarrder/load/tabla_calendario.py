@@ -1,109 +1,179 @@
 import pandas as pd
 import holidays
+from datetime import date
 
 
-def tabla_calendario(
-    fecha_inicio = "2025-01-01",
-    fecha_fin = "2026-12-31"
-    
-):
-
+class tabla_calendario:
     """
-    Genera una tabla calendario con información temporal y laboral
-    para Honduras dentro de un rango de fechas.
+    Clase que genera y encapsula una tabla calendario con información
+    temporal y laboral para Honduras.
 
-    La función crea un DataFrame con un registro por día, incluyendo
-    información del día de la semana, identificación de fines de semana,
-    feriados oficiales de Honduras y una bandera que indica si el día
-    es laboral.
+    Permite construir el calendario por rango de fechas o por mes/año,
+    y expone métodos utilitarios sobre el período resultante.
 
     Parameters
     ----------
-    fecha_inicio : str or datetime-like, default='2025-01-01'
-        Fecha inicial del calendario. Puede proporcionarse como cadena
-        en formato ISO ('YYYY-MM-DD') o como objeto datetime compatible
-        con `pandas.to_datetime`.
-
-    fecha_fin : str or datetime-like, default='2026-12-31'
-        Fecha final del calendario. Puede proporcionarse como cadena
-        en formato ISO ('YYYY-MM-DD') o como objeto datetime compatible
-        con `pandas.to_datetime`.
-
-    Returns
-    -------
-    pandas.DataFrame
-        DataFrame con un registro por día en el rango especificado,
-        que contiene las siguientes columnas:
-
-        - ``fecha`` : datetime64
-            Fecha completa con tipo datetime.
-        - ``dia_semana`` : str
-            Nombre abreviado del día de la semana en español
-            (Lun, Mar, Mié, Jue, Vie, Sáb, Dom).
-        - ``es_fin_semana`` : bool
-            Indica si la fecha corresponde a sábado o domingo.
-        - ``fecha_date`` : date
-            Fecha convertida a tipo `date`, útil para comparaciones
-            con calendarios externos o librerías de feriados.
-        - ``es_feriado`` : bool
-            Indica si la fecha corresponde a un feriado oficial
-            en Honduras.
-        - ``nombre_feriado`` : str or None
-            Nombre del feriado si aplica, de lo contrario `None`.
-        - ``dia_laboral`` : bool
-            Indica si el día es laboral, definido como un día que
-            no es fin de semana ni feriado.
-
-    Notes
-    -----
-    La identificación de feriados se realiza utilizando la librería
-    `holidays`, específicamente el calendario oficial de Honduras.
+    fecha_inicio : str or datetime-like, optional
+        Fecha inicial del calendario (formato ISO 'YYYY-MM-DD').
+        Se ignora si se especifica `mes`.
+    fecha_fin : str or datetime-like, optional
+        Fecha final del calendario (formato ISO 'YYYY-MM-DD').
+        Se ignora si se especifica `mes`.
+    mes : int, optional
+        Número de mes (1-12). Si se especifica, el calendario abarca
+        todo ese mes. Por defecto usa el mes actual.
+    anio : int, optional
+        Año del mes. Solo aplica cuando se usa `mes`.
+        Por defecto usa el año actual.
 
     Examples
     --------
-    >>> calendario = tabla_calendario("2026-01-01", "2026-01-10")
-    >>> calendario.head()
+    >>> # Por mes (año actual)
+    >>> tabla_calendario(mes=7).dias_laborales()
+    23
 
-            fecha dia_semana  es_fin_semana  es_feriado nombre_feriado  dia_laboral
-    0 2026-01-01        Jue          False        True      Año Nuevo        False
-    1 2026-01-02        Vie          False       False           None         True
-    2 2026-01-03        Sáb           True       False           None        False
+    >>> # Por mes y año específico
+    >>> tabla_calendario(mes=8, anio=2027).dias_laborales()
+
+    >>> # Por rango de fechas (comportamiento original)
+    >>> tabla_calendario(fecha_inicio="2025-01-01", fecha_fin="2025-03-31").df
     """
 
+    _DIAS_ES = {
+        "Mon": "Lun",
+        "Tue": "Mar",
+        "Wed": "Mié",
+        "Thu": "Jue",
+        "Fri": "Vie",
+        "Sat": "Sáb",
+        "Sun": "Dom",
+    }
 
+    def __init__(
+        self,
+        fecha_inicio=None,
+        fecha_fin=None,
+        mes: int = None,
+        anio: int = None,
+    ):
+        # Resolver rango según parámetros recibidos
+        if mes is not None:
+            anio_efectivo = anio if anio is not None else date.today().year
+            fecha_inicio, fecha_fin = self._rango_mes(mes, anio_efectivo)
+        else:
+            if fecha_inicio is None:
+                fecha_inicio = "2025-01-01"
+            if fecha_fin is None:
+                fecha_fin = "2026-12-31"
 
-    # Años contenidos en el rango
-    years = list(range(
-        pd.to_datetime(fecha_inicio).year,
-        pd.to_datetime(fecha_fin).year + 1
-    ))
+        self._fecha_inicio = pd.to_datetime(fecha_inicio)
+        self._fecha_fin = pd.to_datetime(fecha_fin)
+        self.df = self._construir()
 
-    hn_holidays = holidays.Honduras(years=years)
+    # ------------------------------------------------------------------
+    # Construcción interna
+    # ------------------------------------------------------------------
 
-    calendario = pd.DataFrame({
-        "fecha": pd.date_range(fecha_inicio, fecha_fin, freq="D")
-    })
+    @staticmethod
+    def _rango_mes(mes: int, anio: int):
+        """Devuelve (fecha_inicio, fecha_fin) para el mes/año indicados."""
+        inicio = pd.Timestamp(year=anio, month=mes, day=1)
+        fin = inicio + pd.offsets.MonthEnd(0)
+        return inicio, fin
 
-    calendario["dia_semana"] = calendario["fecha"].dt.day_name().str[:3]
+    def _construir(self) -> pd.DataFrame:
+        years = list(range(self._fecha_inicio.year, self._fecha_fin.year + 1))
+        hn_holidays = holidays.Honduras(years=years)
+
+        df = pd.DataFrame({
+            "fecha": pd.date_range(self._fecha_inicio, self._fecha_fin, freq="D")
+        })
+
+        df["dia_semana"] = (
+            df["fecha"].dt.day_name().str[:3].map(self._DIAS_ES)
+        )
+        df["es_fin_semana"] = df["fecha"].dt.weekday >= 5
+        df["fecha_date"] = df["fecha"].dt.date
+        df["es_feriado"] = df["fecha_date"].isin(hn_holidays)
+        df["nombre_feriado"] = df["fecha_date"].map(hn_holidays)
+        df["dia_laboral"] = (~df["es_fin_semana"]) & (~df["es_feriado"])
+
+        return df
+
+    # ------------------------------------------------------------------
+    # Métodos utilitarios
+    # ------------------------------------------------------------------
+
+    def dias_laborales(self) -> int:
+        """Cantidad de días laborales en el período."""
+        return int(self.df["dia_laboral"].sum())
+
+    def dias_feriados(self) -> int:
+        """Cantidad de feriados oficiales en el período."""
+        return int(self.df["es_feriado"].sum())
+
+    def dias_fin_semana(self) -> int:
+        """Cantidad de días de fin de semana en el período."""
+        return int(self.df["es_fin_semana"].sum())
+
+    def total_dias(self) -> int:
+        """Total de días en el período."""
+        return len(self.df)
+
+    def feriados(self) -> pd.DataFrame:
+        """
+        Devuelve un DataFrame con solo los feriados del período.
+
+        Returns
+        -------
+        pd.DataFrame
+            Columnas: fecha, dia_semana, nombre_feriado
+        """
+        return (
+            self.df[self.df["es_feriado"]][["fecha", "dia_semana", "nombre_feriado"]]
+            .reset_index(drop=True)
+        )
     
-    calendario["dia_semana"] = calendario["dia_semana"].map({
-        'Wed':'Mié',
-        'Thu':'Jue',
-        'Fri':'vie',
-        'Sat':'Sáb',
-        'Sun':'Dom',
-        'Mon':'Lun',
-        'Tue':'Mar'
-    })
 
-    calendario["es_fin_semana"] = calendario["fecha"].dt.weekday >= 5
+    def dia_inicio_periodo(self) -> str:
+        """Retorna el Día de la semana que inicia el periodo."""
+        fecha_min = self.df['fecha'].min()
+        dia_semana = fecha_min.strftime('%A')  # Retorna el nombre del día de la semana
+        return dia_semana
 
-    calendario["fecha_date"] = calendario["fecha"].dt.date
+    def dia_fin_periodo(self) -> str:
+        """Retorna el Día de la semana que finaliza el periodo."""
+        fecha_max = self.df['fecha'].max()
+        dia_semana = fecha_max.strftime('%A')  # Retorna el nombre del día de la semana
+        return dia_semana
 
-    calendario["es_feriado"] = calendario["fecha_date"].isin(hn_holidays)
+    def resumen(self) -> pd.Series:
+        """
+        Devuelve un resumen con los principales conteos del período.
 
-    calendario["nombre_feriado"] = calendario["fecha_date"].map(hn_holidays)
+        Returns
+        -------
+        pd.Series
+        """
+        return pd.Series({
+            "fecha_inicio":    self._fecha_inicio.date(),
+            "fecha_fin":       self._fecha_fin.date(),
+            "total_dias":      self.total_dias(),
+            "dias_laborales":  self.dias_laborales(),
+            "fines_de_semana": self.dias_fin_semana(),
+            "feriados":        self.dias_feriados(),
+            "dia_inicio":      self.dia_inicio_periodo(),
+            "dia_fin":         self.dia_fin_periodo(),
+        })
 
-    calendario["dia_laboral"] = (~calendario["es_fin_semana"]) & (~calendario["es_feriado"])
+    # ------------------------------------------------------------------
+    # Representación
+    # ------------------------------------------------------------------
 
-    return calendario
+    def __repr__(self):
+        return (
+            f"tabla_calendario("
+            f"{self._fecha_inicio.date()} → {self._fecha_fin.date()}, "
+            f"{self.total_dias()} días, "
+            f"{self.dias_laborales()} laborales)"
+        )
