@@ -92,7 +92,7 @@ Version	Type	Changes
 0.0.4	Feat	Initial release of note structuring logic.
 0.1.3	Fix	Resolved graphic rotation and legend duplication bugs.
 0.1.4	Added normalizar_textos
-0.1.5   Added tabla_calendario (generación de tabla calendario automática)
+0.1.6   Added tabla_calendario (generación de tabla calendario automática)
 
 **Milovan Marrder**
 
