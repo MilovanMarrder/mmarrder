@@ -22,7 +22,7 @@ def _etl_vacaciones_por_tipo(
             usecols=[0, 1, 2, 5, 6, 7, 8],
             dtype={"cod": str},
         )
-        df['tipo_vacaciones'] = 'ordinarias'
+        df['tipo_inasistencia'] = 'vacaciones ordinarias'
     else:
         df = pd.read_excel(
             ruta_archivo,
@@ -31,7 +31,7 @@ def _etl_vacaciones_por_tipo(
             usecols=[0, 1, 2, 5, 10, 11, 12],
             dtype={"cod": str},
         )
-        df['tipo_vacaciones'] = 'profilacticas'
+        df['tipo_inasistencia'] = 'vacaciones profilacticas'
         
     df.columns = [
         "id_empleado",
@@ -41,7 +41,7 @@ def _etl_vacaciones_por_tipo(
         "fecha_inicio",
         "fecha_fin",
         "dias_vacaciones",
-        "tipo_vacaciones"
+        "tipo_inasistencia"
     ]
     df["fecha_inicio"] = pd.to_datetime(df["fecha_inicio"], errors="coerce")
     df = df[
@@ -88,7 +88,8 @@ def vacaciones_etl(
         lambda row: row['dias_inasistencia_en_periodo'] if row['dias_vacaciones'] >= 1 else row['dias_vacaciones'],
         axis=1
     )
-    df_final.drop(columns=['dias_vacaciones'], inplace=True)
+    df_final.drop(columns=['dias_vacaciones','area_gestion'], inplace=True)
+    df_final.rename(columns={'fecha': 'fecha_solicitud', 'depto':'puesto'}, inplace=True)
     return df_final
 
 def permisos_etl(
@@ -109,14 +110,14 @@ def permisos_etl(
         "id_empleado",
         "nombre",
         "puesto",
-        "fecha_permiso",
+        "fecha_solicitud",
         "fecha_inicio",
         "fecha_fin",
         "dias_permiso",
         "permiso_hora_inicio",
         "permiso_hora_fin",
         "horas_permiso",
-        "tipo_permiso",
+        "tipo_inasistencia",
         "observaciones",
         "a",
         "b",
@@ -159,14 +160,14 @@ def permisos_etl(
         axis=1,
     )
     df["inicio_datetime"] = pd.to_datetime(
-        df["fecha_permiso"].astype(str)
+        df["fecha_solicitud"].astype(str)
         + " "
         + df["permiso_hora_inicio"].astype(str),
         errors="coerce",
     )
 
     df["fin_datetime"] = pd.to_datetime(
-        df["fecha_permiso"].astype(str)
+        df["fecha_solicitud"].astype(str)
         + " "
         + df["permiso_hora_fin"].astype(str),
         errors="coerce",
@@ -189,11 +190,11 @@ def permisos_etl(
             "id_empleado",
             "nombre",
             "puesto",
-            "fecha_permiso",
+            "fecha_solicitud",
             "fecha_inicio",
             "fecha_fin",
             "fecha_fin_dentro_periodo",
-            "tipo_permiso",
+            "tipo_inasistencia",
             "dias_inasistencia_en_periodo",
         ]
     ]
