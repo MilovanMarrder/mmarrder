@@ -1,4 +1,5 @@
 import pandas as pd
+from mmarrder.load import tabla_calendario
 
 
 def _etl_vacaciones_por_tipo(
@@ -12,7 +13,7 @@ def _etl_vacaciones_por_tipo(
     Realiza el proceso de ETL para el DataFrame de vacaciones ordinarias.
     Desde el archivo de Excel.
     """
-    if vacaciones_profilacticas:
+    if not vacaciones_profilacticas:
         
         df = pd.read_excel(
             ruta_archivo,
@@ -52,6 +53,7 @@ def _etl_vacaciones_por_tipo(
     
     return df
 
+
 def vacaciones_etl(
     ruta_archivo: str,
     nombre_hoja: str,
@@ -72,17 +74,21 @@ def vacaciones_etl(
     
     df_final = pd.concat([df_ordinarias, df_profilacticas], ignore_index=True)
     
-    deptos_trabajo_seis_horas = []
-    for depto in df_final['depto'].unique():
-        if 'medico' in depto.lower():
-            deptos_trabajo_seis_horas.append(depto)
-            
-            
-    df_final['horas_decimal'] = df_final.apply(
-        lambda fila: 6*fila['dias_vacaciones'] if fila['depto'] in deptos_trabajo_seis_horas else 8*fila['dias_vacaciones'],
-        axis=1  
+    df_final["fecha_fin_dentro_periodo"] = df_final.apply(
+        lambda row: fecha_maxima if row["fecha_fin"] > fecha_maxima else row["fecha_fin"],
+        axis=1,
+        )
+
+    df_final["dias_inasistencia_en_periodo"] = df_final.apply(
+            lambda row: tabla_calendario(fecha_inicio=row["fecha_inicio"], fecha_fin=row["fecha_fin_dentro_periodo"]).dias_laborales(),
+            axis=1,
+        )
+    
+    df_final["dias_inasistencia_en_periodo"] = df_final.apply(
+        lambda row: row['dias_inasistencia_en_periodo'] if row['dias_vacaciones'] >= 1 else row['dias_vacaciones'],
+        axis=1
     )
-        
+    df_final.drop(columns=['dias_vacaciones'], inplace=True)
     return df_final
 
 def permisos_etl(ruta_archivo, sheet_name,fecha_corte = "2026-01-31"):
