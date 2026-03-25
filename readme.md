@@ -94,6 +94,7 @@ Version	Type	Changes
 0.1.4	Added normalizar_textos
 0.1.6   Added tabla_calendario (generación de tabla calendario automática)
 0.1.6   Added params to query_db from connections
+1.8.0   Added Absence ETL (Permisos y vacaciones desde Excel de Talento Humano)
 
 **Milovan Marrder**
 
