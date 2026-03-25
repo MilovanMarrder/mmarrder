@@ -135,7 +135,7 @@ def permisos_etl(
         df["fecha_inicio"], errors="coerce"
     )
     df["fecha_fin"] = pd.to_datetime(df["fecha_fin"], errors="coerce")
-    fecha_corte = pd.to_datetime(fecha_maxima)
+    
     df["fecha_fin_dentro_periodo"] = df.apply(
         lambda row: (
             fecha_maxima if row["fecha_fin"] > fecha_maxima else row["fecha_fin"]
@@ -153,7 +153,7 @@ def permisos_etl(
     df["dias_inasistencia_en_periodo"] = df.apply(
         lambda row: (
             row["dias_inasistencia_en_periodo"]
-            if row["dias_permiso"] >= 1
+            if (row["dias_permiso"] >= 1) or (pd.isna(row["dias_permiso"]))
             else row["dias_permiso"]
         ),
         axis=1,
@@ -192,6 +192,7 @@ def permisos_etl(
             "fecha_permiso",
             "fecha_inicio",
             "fecha_fin",
+            "fecha_fin_dentro_periodo",
             "tipo_permiso",
             "dias_inasistencia_en_periodo",
         ]
