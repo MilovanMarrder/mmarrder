@@ -88,7 +88,7 @@ def vacaciones_etl(
         lambda row: row['dias_inasistencia_en_periodo'] if row['dias_vacaciones'] >= 1 else row['dias_vacaciones'],
         axis=1
     )
-    df_final.drop(columns=['dias_vacaciones','area_gestion'], inplace=True)
+    df_final.drop(columns=['dias_vacaciones'], inplace=True)
     df_final.rename(columns={'fecha': 'fecha_solicitud', 'depto':'puesto'}, inplace=True)
     return df_final
 
@@ -186,7 +186,6 @@ def permisos_etl(
     )
     df = df[
         [
-            "area_gestion",
             "id_empleado",
             "nombre",
             "puesto",
