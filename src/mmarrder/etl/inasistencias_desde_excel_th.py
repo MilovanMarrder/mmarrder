@@ -91,6 +91,7 @@ def vacaciones_etl(
     df_final.drop(columns=['dias_vacaciones'], inplace=True)
     df_final.rename(columns={'fecha': 'fecha_solicitud', 'depto':'puesto'}, inplace=True)
     _mostrar_estadisticas_permisos_y_vacaciones(df_final)
+    
     return df_final
 
 def permisos_etl(
@@ -199,7 +200,7 @@ def permisos_etl(
         ]
     ]
     _mostrar_estadisticas_permisos_y_vacaciones(df)
-
+    df['tipo_inasistencia'] = df['tipo_inasistencia'].str.lower()
     return df
 
 def _mostrar_estadisticas_permisos_y_vacaciones(df_inassistencia):
