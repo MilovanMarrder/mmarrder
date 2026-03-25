@@ -97,6 +97,7 @@ Version	Type	Changes
 1.8.0   Added Absence ETL (Permisos y vacaciones desde Excel de Talento Humano)
 1.8.1   Fix vacaciones_etl
 1.8.5   Fix permisos_etl
+1.8.6   Added Resumen to etl
 
 **Milovan Marrder**
 

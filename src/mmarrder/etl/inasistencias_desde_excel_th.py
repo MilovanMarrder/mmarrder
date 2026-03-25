@@ -90,6 +90,7 @@ def vacaciones_etl(
     )
     df_final.drop(columns=['dias_vacaciones'], inplace=True)
     df_final.rename(columns={'fecha': 'fecha_solicitud', 'depto':'puesto'}, inplace=True)
+    _mostrar_estadisticas_permisos_y_vacaciones(df_final)
     return df_final
 
 def permisos_etl(
@@ -197,5 +198,48 @@ def permisos_etl(
             "dias_inasistencia_en_periodo",
         ]
     ]
+    _mostrar_estadisticas_permisos_y_vacaciones(df)
 
     return df
+
+def _mostrar_estadisticas_permisos_y_vacaciones(df_inassistencia):
+    print("--" * 40)
+    print("Solicitudes de permisos Extraídas:")
+    print(
+        df_inassistencia.groupby("tipo_inasistencia")["fecha_solicitud"]
+        .count()
+        .sort_values(ascending=False)
+    )
+    print("--" * 40)
+    print("Días de permisos extraídos:")
+    print(
+        df_inassistencia.groupby("tipo_inasistencia")["dias_inasistencia_en_periodo"]
+        .sum()
+        .sort_values(ascending=False)
+    )
+    print("--" * 40)
+    print("TOP 10 empleados con más días de permisos en el periodo:")
+    print(
+        df_inassistencia.groupby(["tipo_inasistencia", "nombre"])[
+            "dias_inasistencia_en_periodo"
+        ]
+        .sum()
+        .sort_values(ascending=False)
+        .head(10)
+
+    )
+    porcentaje_permisos_top10 = (
+        df_inassistencia.groupby(["tipo_inasistencia", "nombre"])[
+            "dias_inasistencia_en_periodo"
+        ]
+        .sum()
+        .sort_values(ascending=False)
+        .head(10)
+        .sum()
+        / df_inassistencia["dias_inasistencia_en_periodo"].sum()
+    ) * 100
+    print(
+        "Las permisos del top 10 empleados representan el {:.2f}% del total de días del periodo.".format(
+            porcentaje_permisos_top10
+        )
+    )
