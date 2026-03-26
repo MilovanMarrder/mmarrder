@@ -139,6 +139,17 @@ def permisos_etl(
     )
     df["fecha_fin"] = pd.to_datetime(df["fecha_fin"], errors="coerce")
     
+    df["fecha_fin"] = df.apply(
+    lambda row: (
+        row["fecha_inicio"]
+        if pd.notna(row["permiso_hora_fin"]) and pd.isna(row["fecha_fin"])
+        else row["fecha_fin"]
+    ),
+    axis=1,
+    )
+
+    fecha_maxima = pd.to_datetime(fecha_maxima)
+    
     df["fecha_fin_dentro_periodo"] = df.apply(
         lambda row: (
             fecha_maxima if row["fecha_fin"] > fecha_maxima else row["fecha_fin"]

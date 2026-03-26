@@ -99,6 +99,7 @@ Version	Type	Changes
 1.8.5   Fix permisos_etl
 1.8.6   Added Resumen to etl
 1.8.7   Fix Bug permisos_etl
+1.8.8   Fix Bug permisos_etl en fecha_fin
 
 **Milovan Marrder**
 
