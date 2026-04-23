@@ -2,8 +2,9 @@ import pandas as pd
 import pymssql
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-def query_db(query: str, params: tuple | dict | None = None) -> pd.DataFrame:
+def query_db(query: str, params: tuple | dict | None = None, ) -> pd.DataFrame:
     """
     Ejecuta una consulta SQL en la base de datos y retorna los resultados en un DataFrame.
 
@@ -40,15 +41,22 @@ def query_db(query: str, params: tuple | dict | None = None) -> pd.DataFrame:
         >>> df = query_db(sql, params=data)
     """
     df = None  # Inicializamos df para evitar errores si falla el try
-    
-    try:
-        load_dotenv()
+    # Definir ruta explícita al .env (raíz del proyecto)
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    env_path = BASE_DIR / ".env"
 
-        user = os.getenv('USER')
-        password = os.getenv('PASSWORD')
-        database = os.getenv('DATABASE')
-        server = os.getenv('SERVER')
+    load_dotenv(dotenv_path=env_path)
+
+    user = os.getenv('USER')
+    password = os.getenv('PASSWORD')
+    database = os.getenv('DATABASE')
+    server = os.getenv('SERVER')
+
+    # Validación crítica (esto te ahorra horas de debugging)
+    if not all([user, password, database, server]):
+        raise ValueError("Variables de entorno no cargadas correctamente")
         
+    try:
         # Establecer la conexión
         conn = pymssql.connect(server=server, user=user, password=password, database=database)
         
