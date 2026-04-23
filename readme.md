@@ -103,6 +103,7 @@ Version	Type	Changes
 1.9.0   Added file Naming function: generar_ruta_salida
 1.9.1   feat file naming function
 1.9.2   feat: Definiendo raíz de proyecto para .env en query_db
+1.9.3   bug: Reparando rutas de variables en query_db
 
 **Milovan Marrder**
 
