@@ -102,6 +102,7 @@ Version	Type	Changes
 1.8.8   Fix Bug permisos_etl en fecha_fin
 1.9.0   Added file Naming function: generar_ruta_salida
 1.9.1   feat file naming function
+1.9.2   feat: Definiendo raíz de proyecto para .env en query_db
 
 **Milovan Marrder**
 
