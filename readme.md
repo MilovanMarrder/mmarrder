@@ -104,6 +104,7 @@ Version	Type	Changes
 1.9.1   feat file naming function
 1.9.2   feat: Definiendo raíz de proyecto para .env en query_db
 1.9.4   bug: Reparando rutas de variables en query_db
+1.10.0  feat: New function at load. "cargar_config"
 
 **Milovan Marrder**
 
