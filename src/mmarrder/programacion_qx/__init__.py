@@ -3,6 +3,7 @@ from .data_loader import (
     get_schedule_from_file,
     get_all_surgery_info_from_file,
     get_all_surgery_info_from_folder,
+    obtener_programacion_quirofano
 )
 
 from .pipeline import (
@@ -39,4 +40,5 @@ __all__ += [
     "cirugias_por_dia",
     "duracion_promedio_cirugia",
     "ocupacion_por_quirofano",
-]
+    "obtener_programacion_quirofano"
+    ]
