@@ -52,9 +52,9 @@ def export_to_excel_with_tables(
 
     def _autofit(ws, df: pd.DataFrame) -> None:
         for col_idx, col_name in enumerate(df.columns, start=1):
-            if len(df):
-                series = df[col_name].astype(str)
-                max_len = max(len(str(col_name)), series.map(len).max())
+            if len(df) > 0:
+                series_lengths = df[col_name].astype(str).str.len()
+                max_len = max(len(str(col_name)), series_lengths.max())
             else:
                 max_len = len(str(col_name))
 
