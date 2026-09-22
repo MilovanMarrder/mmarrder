@@ -2,10 +2,12 @@ import unicodedata
 import re
 import pandas as pd
 
-def normalizar_texto(texto: str, estilo_texto = 'UPPER') -> str:
+def normalizar_texto(texto: str, estilo_texto = 'UPPER', espacios = None) -> str:
     """
     Normaliza un texto eliminando tildes, reduciendo espacios en blanco
     repetidos y aplicando un estilo de capitalización especificado.
+    Se puede reemplazar los espacios por un caracter en especial, por ejemplo: '_'
+    para los snake_case, o eliminación de estos para un PascalCase.
 
     La función convierte el texto a uno de los siguientes estilos:
     ``'upper'``, ``'lower'`` o ``'title'``. Luego elimina diacríticos
@@ -53,10 +55,26 @@ def normalizar_texto(texto: str, estilo_texto = 'UPPER') -> str:
             texto = str(texto).title().strip()
         case 'lower':
             texto = str(texto).lower().strip()
+        case 'snake_case':
+            texto = str(texto).lower().strip()
+            espacios = "_"
+        case 'pascalcase':
+            texto = str(texto).title().strip()
+            espacios = ""
+        case 'camelcase':
+            texto1 = str(texto).lower().strip()
+            texto = str(texto).title().strip()
+            texto = texto1[0]+texto[1:]
+            espacios = ""
         case _:
             raise ValueError(f"Estilo de texto no válido: {estilo_texto}")
     texto = unicodedata.normalize("NFKD", texto)
     texto = "".join(c for c in texto if not unicodedata.combining(c))
-    texto = re.sub(r"\s+", " ", texto)
+
+        
+    if espacios == None:
+        texto = re.sub(r"\s+", " ", texto)
+    else:
+        texto = re.sub(r"\s+", espacios, texto)
     return texto
 
