@@ -716,3 +716,175 @@ def get_all_surgery_info_from_folder(folder):
     for file in files:
         df = pd.concat([df, get_all_surgery_info_from_file(file)], ignore_index=True)
     return df
+
+
+
+
+### Adaptación actual en qx_report_v3
+
+# Inicio de Celda
+
+
+# Inicio de Celda
+def carga_rutas_archivos(path:str = 'config.json')->list:
+    """
+    Obtener el listado de las rutas de los archivos. 
+    
+    **parámetros**: ruta del archivo de configuración que contiene los paths.
+    
+    **return**: Listado de rutas
+    """
+    import json
+    
+    # Cargar rutas de los archivos fuentes
+    with open(path, "r", encoding='utf-8') as file:
+        config = json.load(file)
+        
+    paths = []
+    for x in config['data_sources']['quirófano']:
+        print("------")
+        paths.append(x['path'])
+        print(f'ruta agregada: {x['path']}')
+    return paths
+
+# Inicio de Celda
+especilidad_medicos = {
+    "Dr. Carlos Barrientos": "DERMATOLOGIA",
+    "Dr. Pablo Caceres": "GASTROENTEROLOGIA",
+    "Dra. Marcela Da Silva": "ODONTOLOGIA",
+    "Dra. Milena Morales": "OTORRINOLARINGOLOGIA",
+    "Dr. Mauricio Benitez": "CIRUGIA GENERAL PEDIATRICA",
+    "Dr. Alejandro Bustillo": "CIRUGIA GENERAL PEDIATRICA",
+    "Dr. Sergio Velez": "CIRUGIA GENERAL PEDIATRICA",
+    "Dr. Jorge Ochoa": "CARDIOLOGIA",
+    "Dra. Daniela Garcia": "HEMODINAMIA",
+    "Dr. Christian Salgado": "DERMATOLOGIA",
+    "Dr. Miguel Ramos": "CARDIOLOGIA",
+    "Dra. Carolina Lopez": "DERMATOLOGIA",
+    "Dr. Miguel Angel Ramos Soriano": "CARDIOLOGIA",
+    "Dra. Osiris Maria Gonzalez Flores": "GASTROENTEROLOGIA",
+    "Dra. Marcela Da Silva Maldonado": "ODONTOLOGIA",
+    "Dra. Mielan Morales": "OTORRINOLARINGOLOGIA",
+    "Dr. Alejandro Jose Bustillo Ponce": "CIRUGIA GENERAL PEDIATRICA",
+    "Dr. Christian Marcial Salgado Flores": "DERMATOLOGIA",
+    "Dr. Alejandro Jose Bustillo poce": "CIRUGIA GENERAL PEDIATRICA",
+    "Dra. Sergio Velez": "CIRUGIA GENERAL PEDIATRICA",
+}
+
+nombre_medicos_limpios = {
+    "Dra. Marcela Da Silva Maldonado": "Dra. Marcela Da Silva",
+    "Dr. Mauricio Benitez": "CIRUGIA GENERAL PEDIATRICA",
+    "Dr. Alejandro Jose Bustillo Ponce": "Dr. Alejandro Bustillo",
+    "Dr. Alejandro Jose Bustillo poce": "Dr. Alejandro Bustillo",
+    "Dr. Miguel Angel Ramos Soriano": "Dr. Miguel Ramos",
+    "Dra. Sergio Velez": "Dr. Sergio Velez",
+    "Dr. Christian Marcial Salgado Flores": "Dr. Christian Salgado",
+    "Dra. Mielan Morales": "Dra. Milena Morales",
+    "JORGE HUMBERTO OCHOA MARTINEZ":"Dr. Jorge Humberto Ochoa",
+    "JORGE OCHOA":"Dr. Jorge Humberto Ochoa",
+    "Dr. Alejandro Jose Bustillo": "Dr. Alejandro Bustillo",
+    
+}
+
+# Inicio de Celda
+def extraer_programacion(archivos: list) -> pd.DataFrame:
+    """
+    Se toman todos los archivos base, para extraer la programación.
+
+    parametros
+    ----------
+    listado de rutas de los archivos de programación de quirófano
+
+    returns
+    -------
+    DataFrame con la programación contenida en todos los archivos fuentes.
+
+    """
+
+    df = pd.DataFrame({})
+    for archivo in archivos:
+        df = pd.concat([df, get_schedule_from_file(archivo)])
+
+    df["semana"] = df["fecha"].dt.isocalendar().week
+
+    return df
+
+# Inicio de Celda
+def distribuir_horas_en_rango_horario(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Se distribuyen la cantidad de horas entre el horario para los procedimientos en
+    la programación.
+
+    Parametros
+    ----------
+    DataFrame con programación.
+
+    Return
+    ------
+    DataFrame con horas distribuidas.
+    """
+
+    # 1. Agrupamos por bloques para saber cuántas filas vacías siguen a una con datos
+    # Identificamos dónde empieza un nuevo bloque (cuando hora_inicio no es nulo)
+    df["bloque"] = df["hora_inicio"].notnull().cumsum()
+
+    # 2. Contamos cuántas filas hay por cada bloque para distribuir la duración
+    df["count_bloque"] = df.groupby("bloque")["dia_semana"].transform("count")
+
+    # 3. Propagamos los valores iniciales (hora_inicio y duracion_horas) hacia abajo
+    df["hora_base"] = df.groupby("bloque")["hora_inicio"].ffill()
+    df["duracion_total"] = df.groupby("bloque")["duracion_horas"].ffill()
+
+    # 4. Calculamos la duración individual por fila
+    df["duracion_individual"] = df["duracion_total"] / df["count_bloque"]
+
+    # 5. Calculamos la hora_inicio de cada fila
+    # Convertimos hora_base a objeto datetime para poder sumar tiempo
+    df["hora_dt"] = pd.to_datetime(df["hora_base"], format="%H:%M")
+
+    # Creamos un índice dentro de cada bloque (0, 1, 2...)
+    df["idx_bloque"] = df.groupby("bloque").cumcount()
+
+    # Sumamos el acumulado de duración individual a la hora base
+    df["hora_inicio_calc"] = df["hora_dt"] + pd.to_timedelta(
+        df["idx_bloque"] * df["duracion_individual"], unit="h"
+    )
+
+    # 6. Calculamos la hora_fin
+    df["hora_fin_calc"] = df["hora_inicio_calc"] + pd.to_timedelta(
+        df["duracion_individual"], unit="h"
+    )
+
+    # Formateamos de vuelta a HH:MM y limpiamos columnas auxiliares
+    df["hora_inicio"] = df["hora_inicio_calc"].dt.strftime("%H:%M")
+    df["hora_fin"] = df["hora_fin_calc"].dt.strftime("%H:%M")
+    df["duracion_horas"] = df["duracion_individual"]
+
+    return df
+
+# Inicio de Celda
+def obtener_programacion_quirofano(paths:list=None, periodo:tuple = None)->pd.DataFrame:
+    """
+    Pipeline general para ETL de las programaciones de quirófano
+    
+    **parámetros**
+    Paths: Listado con las rutas de los archivos
+    Periodo: Tupla con la fecha de inicio y de fin del periodo. Default None.
+    
+    **return**: DataFrame de la programación extraída.
+    """
+    
+    if paths is None:
+        paths = carga_rutas_archivos()
+    df = extraer_programacion(archivos=paths)
+    df = distribuir_horas_en_rango_horario(df)
+    #limpiar especialidades
+    df['especialidad'] = df['medico'].map(lambda x: especilidad_medicos.get(x, 'Desconocido'))
+    #Limpieza de Expediente
+    df['expediente'] = df['codigo_expediente'].str.replace("-","")
+    #Solo columnas necesarias
+    df = df[['quirofano', 'expediente', 'especialidad',  'medico','fecha' , 'semana','dia_semana',
+        'hora_inicio', 'hora_fin', 'duracion_horas', 
+        'procedimiento', 'archivo']]
+
+    return df
